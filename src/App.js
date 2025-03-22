@@ -1,6 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
-
+import Navbar from './Components/Navbar/Navbar';
+import TaskBoard from "./Components/Task/Taskbuddy.jsx"
+import Taskboard from './Components/Task2/Task2.jsx';
 function App() {
   return (
     <div className="App">
@@ -18,6 +20,9 @@ function App() {
           Learn React
         </a>
       </header>
+      <TaskBoard/>
+      <Taskboard/>
+      {/* <Navbar/> */}
     </div>
   );
 }

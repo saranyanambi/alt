@@ -11,28 +11,32 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
+import { useTasks } from "../TaskContext.jsx";
+import Navbar from "../Navbar/Navbar.jsx";
 
-
-const Taskboard = () => {
+const Taskboard = ({filters}) => {
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
   
-  const [tasks, setTasks] = useState({
-    todo: [
-      { id: uuidv4(), title: "Interview with Design Team", due: "Today", status: "TO-DO", category: "Work" },
-      { id: uuidv4(), title: "Team Meeting", due: "30 Dec, 2024", status: "TO-DO", category: "Personal" },
-      { id: uuidv4(), title: "Design a Dashboard page along with wireframes", due: "31 Dec, 2024", status: "TO-DO", category: "Work" },
-    ],
-    inProgress: [
-      { id: uuidv4(), title: "Morning Workout", due: "Today", status: "IN-PROGRESS", category: "Work" },
-      { id: uuidv4(), title: "Code Review", due: "Today", status: "IN-PROGRESS", category: "Personal" },
-      { id: uuidv4(), title: "Update Task Tracker", due: "25 Dec, 2024", status: "IN-PROGRESS", category: "Work" },
-    ],
-    completed: [
-      { id: uuidv4(), title: "Submit Project Proposal", due: "Today", status: "COMPLETED", category: "Work" },
-      { id: uuidv4(), title: "Birthday Gift Shopping", due: "Today", status: "COMPLETED", category: "Personal" },
-      { id: uuidv4(), title: "Client Presentation", due: "25 Dec, 2024", status: "COMPLETED", category: "Work" },
-    ],
-  });
+  // const [tasks, setTasks] = useState({
+  //   todo: [
+  //     { id: uuidv4(), title: "Interview with Design Team", due: "Today", status: "TO-DO", category: "Work" },
+  //     { id: uuidv4(), title: "Team Meeting", due: "30 Dec, 2024", status: "TO-DO", category: "Personal" },
+  //     { id: uuidv4(), title: "Design a Dashboard page along with wireframes", due: "31 Dec, 2024", status: "TO-DO", category: "Work" },
+  //   ],
+  //   inProgress: [
+  //     { id: uuidv4(), title: "Morning Workout", due: "Today", status: "IN-PROGRESS", category: "Work" },
+  //     { id: uuidv4(), title: "Code Review", due: "Today", status: "IN-PROGRESS", category: "Personal" },
+  //     { id: uuidv4(), title: "Update Task Tracker", due: "25 Dec, 2024", status: "IN-PROGRESS", category: "Work" },
+  //   ],
+  //   completed: [
+  //     { id: uuidv4(), title: "Submit Project Proposal", due: "Today", status: "COMPLETED", category: "Work" },
+  //     { id: uuidv4(), title: "Birthday Gift Shopping", due: "Today", status: "COMPLETED", category: "Personal" },
+  //     { id: uuidv4(), title: "Client Presentation", due: "25 Dec, 2024", status: "COMPLETED", category: "Work" },
+  //   ],
+  // });
+
+  const { tasks, setTasks } = useTasks();
+  // const [filters, setFilters] = useState({ category: "All", dueDate: "" });
   const [newTask, setNewTask] = useState("");
   const [date,setDate]=useState("");
   const [category,setCategory]=useState("")
@@ -65,21 +69,8 @@ const Taskboard = () => {
   return (
     <div style={{ padding: "20px" }}>
         <Box>
-            <div>Filter by</div>
-            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-          <option value="All">All</option>
-          <option value="Work">Work</option>
-          <option value="Personal">Personal</option>
-        </select>
-
-         <TextField
-          type="date"
-          value={selectedDueDate}
-          onChange={(e) => setSelectedDueDate(e.target.value)}
-          label="Due Date"
-        
-          style={{ marginLeft: "10px" }}
-        />
+       
+           
         </Box>
       <DragDropContext onDragEnd={onDragEnd}>
         
@@ -115,7 +106,7 @@ const Taskboard = () => {
                     </Box>
 
                     <Box>
-                    <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} placeholder="Add Date"/>
+                    <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} name="Add Date"/>
                     </Box>
 
                     <Box >
@@ -154,26 +145,32 @@ const Taskboard = () => {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Task</TableCell>
-                          <TableCell>Due Date</TableCell>
-                          <TableCell>Category</TableCell>
-                          <TableCell>Actions</TableCell>
+                          <TableCell>Task Name</TableCell>
+                          <TableCell>Due on</TableCell>
+                          <TableCell>Task Status</TableCell>
+                          <TableCell>Task Category</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody ref={provided.innerRef} {...provided.droppableProps}>
-                        {tasksList.filter(task =>  (selectedCategory === "All" || task.category === selectedCategory) &&
-                          (selectedDueDate === "" || task.date === selectedDueDate)).map((task, index) =>  (
+                        {tasksList.filter(task =>  (filters.category === "All" || task.category === filters.category) &&
+                        (filters.dueDate === "" || task.due === filters.dueDate)).map((task, index) =>  (
                           <Draggable key={task.id} draggableId={task.id} index={index}>
                             {(provided) => (
                               <TableRow ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                 <TableCell>
+                                  <Box sx={{display:"flex",alignItems:"center"}}>
                                      <Checkbox {...label} />
-                                     <img src="/drag_icon.png" />
-                                     <img src="/checkmark.png" alt="Checkmark" />
+                                     <img src="/drag_icon.png" style={{height:"25px"}}/>
+                                     {task.status === "completed" ? (
+                                                    <img src="/greencheckmark.png" alt="Checkmark" style={{height:"25px"}}/>
+                                                  ) : (
+                                                    <img src="/checkmark.png" alt="Checkmark" style={{height:"25px"}}/>
+                                                  )}
                                      
-                                     {task.title}</TableCell>
+                                     <Box sx={{ textDecoration: task.status === "completed" ? "line-through" : "none" }}>{task.title}</Box>
+                                     </Box></TableCell>
                                 <TableCell>{task.due}</TableCell>
-                                <TableCell><Button>{task.status}</Button></TableCell>
+                                <TableCell><Box>{task.status}</Box></TableCell>
                                 <TableCell>{task.category}</TableCell>
                                 <TableCell>
                                   <IconButton onClick={() => deleteTask(status, task.id)} color="secondary">
